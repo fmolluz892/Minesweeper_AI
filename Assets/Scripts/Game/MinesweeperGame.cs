@@ -84,7 +84,8 @@ public class MinesweeperGame : MonoBehaviour
             new System.Collections.Generic.List<string>
             {
         "Nivel 1 - Aleatorio",
-        "Nivel 2 - Lógico"
+        "Nivel 2 - Lógico",
+        "Nivel 3 - Probabilístico"
             }
         );
 
@@ -195,11 +196,26 @@ public class MinesweeperGame : MonoBehaviour
         {
             if (minesweeperBot != null)
             {
-                BotDifficulty selectedDifficulty =
-                    difficultyDropdown.value == 0
-                        ? BotDifficulty.Random
-                        : BotDifficulty.Logical;
+                BotDifficulty selectedDifficulty;
+                switch (difficultyDropdown.value)
+                {
+                    case 0:
+                        selectedDifficulty = BotDifficulty.Random;
+                        break;
 
+                    case 1:
+                        selectedDifficulty = BotDifficulty.Logical;
+                        break;
+
+                    case 2:
+                        selectedDifficulty = BotDifficulty.Probabilistic;
+                        break;
+
+                    default:
+                        selectedDifficulty = BotDifficulty.Random;
+                        break;
+                }
+                        
                 minesweeperBot.SetDifficulty(selectedDifficulty);
 
                 minesweeperBot.StartBot();

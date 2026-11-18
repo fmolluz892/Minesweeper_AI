@@ -8,7 +8,8 @@ using UnityEngine;
 public enum BotDifficulty
 {
     Random,
-    Logical
+    Logical,
+    Probabilistic
 }
 
 public class MinesweeperBot : MonoBehaviour
@@ -23,7 +24,7 @@ public class MinesweeperBot : MonoBehaviour
     [SerializeField] private float delayBetweenMoves = 0.75f;
 
     private Coroutine botCoroutine;
-
+    private MinesweeperProbabilitySolver probabilitySolver = new MinesweeperProbabilitySolver();
 
     
     // Inicia la ejecución automática.
@@ -77,6 +78,10 @@ public class MinesweeperBot : MonoBehaviour
             {
                 actionPerformed = PlayLogicalMove();
             }
+            else if (difficulty == BotDifficulty.Probabilistic)
+            {
+                actionPerformed = PlayProbabilisticMove();
+            }
 
             if (!actionPerformed)
             {
@@ -87,6 +92,8 @@ public class MinesweeperBot : MonoBehaviour
 
         botCoroutine = null;
     }
+
+   
 
 
     // Juego Aleatorio
@@ -261,6 +268,39 @@ public class MinesweeperBot : MonoBehaviour
     public void SetDifficulty(BotDifficulty newDifficulty)
     {
         difficulty = newDifficulty;
+    }
+
+
+    // Juevo Basado en Probabilidades
+    private bool PlayProbabilisticMove()
+    {
+        bool foundCell = probabilitySolver.TryGetSafestCell(
+                board,
+                out Vector2Int selectedCell,
+                out double probability
+                );
+
+        if (!foundCell)
+        {
+            Debug.Log("No he completado el análisis. Movimiento aleatorio");
+
+            return PlayRandomMove();
+        }
+
+        Debug.Log(
+        $"Bot probabilístico: fila {selectedCell.x}, " +
+        $"columna {selectedCell.y}. " +
+        $"Riesgo estimado: {probability:P2}"
+        );
+        // Seguridad de Mina
+
+        if (probability >= 0.99999)
+        {
+            return board.FlagCell(selectedCell.x, selectedCell.y);
+        }
+
+        return board.RevealCell(selectedCell.x, selectedCell.y);
+
     }
 
 
